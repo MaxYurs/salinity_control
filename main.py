@@ -19,12 +19,18 @@ factory = rpi_gpio.KeypadFactory()
 # Try factory.create_4_by_3_keypad
 # and factory.create_4_by_4_keypad for reasonable defaults
 keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS)
+
+# ----------------------------------------------------------------------------------- #
+#                              Salinity Variable Def                                  #
+# ----------------------------------------------------------------------------------- #
+sal_desired = 0
 loop_bool = True
 
 class KeyStore:
 	def __init__(self):
 		# Empty list to store characters
 		self.pressed_keys = []
+		self.salinity = 0;
 
 	def store_key(self, key):
 		if(key=='#'):
@@ -36,18 +42,34 @@ class KeyStore:
 
 	def clear_keys(self):
 		self.pressed_keys.clear()
+		
+	def get_salinity(self):
+		# Check if press_keys is empty
+		if len(self.pressed_keys) != 0:
+			# Convert integer list into string
+			s = [str(i) for i in self.pressed_keys]
 
-#def printKey(key):
-#    print(key)
+			# Join list items using join()
+			self.salinity = int("".join(s))
+		else:
+			print("List is empty, salinity set to default\n")
+			self.salinity = 0
+		return self.salinity
+
 
 keys = KeyStore()
 
-# printKey will be called each time a keypad button is pressed
+# keys.store_key will be called each time a keypad button is pressed
 keypad.registerKeyPressHandler(keys.store_key)
+
+# ----------------------------------------------------------------------------------- #
+#                                    Main                                             #
+# ----------------------------------------------------------------------------------- #
 
 print("Hello Max\n")
 
 while(loop_bool):
+	sal_desired = keys.get_salinity()
 	time.sleep(0.2)
 
 keypad.cleanup()
