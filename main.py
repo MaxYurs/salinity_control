@@ -1,7 +1,13 @@
 #!/usr/bin/env python3.7
 
+# ----------------------------------------------------------------------------------- #
+#       Adapted from code written by iTechno on the blog post "Interface 16x2         #    
+#       Alphanumeric LCD And4x4 Matrix Keypad With Raspberry Pi3"                     #
+#-------------------------------------------------------------------------------------#
+
 from pad4pi import rpi_gpio
 import time
+import RPi.GPIO as GPIO
 
 class KeyStore:
 	def __init__(self):
