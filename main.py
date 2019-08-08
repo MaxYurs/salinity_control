@@ -8,6 +8,7 @@
 from pad4pi import rpi_gpio
 import time
 import RPi.GPIO as GPIO
+from uFire_EC import uFire_EC
 
 class KeyStore:
 	def __init__(self):
@@ -32,6 +33,8 @@ class KeyStore:
 	def get_salinity(self):
 		# Check if press_keys is empty
 		if len(self.pressed_keys) != 0:
+			if(self.pressed_keys[-1] == "*"):
+				return
 			# Convert integer list into string
 			s = [str(i) for i in self.pressed_keys]
 
@@ -63,13 +66,15 @@ keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PI
 #                              Salinity Variable Def                                  #
 # ----------------------------------------------------------------------------------- #
 sal_desired = 0
-loop_bool = True
+sal_cur     = 0
+loop_bool   = True
 
 keys = KeyStore()
 
 # keys.store_key will be called each time a keypad button is pressed
 keypad.registerKeyPressHandler(keys.store_key)
 
+ec=uFire_EC(i2c_bus=1, address=0x3c)
 # ----------------------------------------------------------------------------------- #
 #                                    Main                                             #
 # ----------------------------------------------------------------------------------- #
@@ -77,16 +82,23 @@ keypad.registerKeyPressHandler(keys.store_key)
 print("Hello Max\n")
 
 while(loop_bool):
+	if(sal_desired == 999):
+		break
 	if(keys.check_salinity):
 		sal_desired = keys.get_salinity()
 		print("Setting desired salinity to " + str(sal_desired) + " \n")
 		keys.clear_keys()
 		keys.check_salinity = 0
 		
-	if(keys.pressed_keys[-1:] == '*'):
+	if(keys.pressed_keys[-1:] == "*"):
 		print("Exiting salinity control\n")
-		loop_bool = False
+		break
 		
+	ec.measureEC()
+	sal_cur=ec.salinityPSU
+	if(sal_desired > sal_cur):
+		#SET GPIO HIGH 
+	print(str(sal_cur) + " : current salinity\n" + str(sal_desired) + " : desired salinity\n")
 	time.sleep(0.2)
 
 keypad.cleanup()
