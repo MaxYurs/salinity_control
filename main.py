@@ -10,6 +10,9 @@ import time
 import RPi.GPIO as GPIO
 from uFire_EC import uFire_EC
 import Adafruit_CharLCD as LCD
+import os.path
+from os import path
+
 
 class KeyStore:
 	def __init__(self):
@@ -99,6 +102,13 @@ keys = KeyStore()
 keypad.registerKeyPressHandler(keys.store_key)
 
 ec=uFire_EC(i2c_bus=1, address=0x3c)
+
+# ----------------------------------------------------------------------------------- #
+#                                 Get Settings                                        #
+# ----------------------------------------------------------------------------------- #
+if(path.exists('settings.txt'):
+   #TODO: Pull default salinity from file "settings.txt" f=open("settings.txt", 
+
 # ----------------------------------------------------------------------------------- #
 #                                    Main                                             #
 # ----------------------------------------------------------------------------------- #
